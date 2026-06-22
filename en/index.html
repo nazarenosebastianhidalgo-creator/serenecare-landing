@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SereneCare — Smart Practice Management for Psychologists</title>
+<meta name="description" content="All-in-one software for psychologists and mental health clinics: scheduling, SOAP notes, teletherapy, patient portal, PHQ-9/GAD-7 assessments, billing. GDPR compliant." />
+<link rel="canonical" href="https://serenecare.es/en" />
+<link rel="alternate" hreflang="es" href="https://serenecare.es" />
+<link rel="alternate" hreflang="en" href="https://serenecare.es/en" />
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/logo.png" />
+<link rel="apple-touch-icon" href="/logo.png" />
+<!-- Open Graph / social -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="SereneCare — Practice Management for Psychologists" />
+<meta property="og:description" content="Less paperwork, more time for your patients. Scheduling, SOAP notes, teletherapy, and patient portal in one platform. GDPR compliant." />
+<meta property="og:image" content="https://serenecare.es/logo.png" />
+<meta property="og:url" content="https://serenecare.es/en" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="SereneCare — Practice Management for Psychologists" />
+<meta name="twitter:description" content="Less paperwork, more time for your patients. GDPR compliant." />
+<meta name="twitter:image" content="https://serenecare.es/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5WGP98EFWQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5WGP98EFWQ');
+</script>
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "wzrmomhufz");
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #020617;
+    --bg-2: #060d22;
+    --bg-3: #0a1330;
+    --emerald: #34d399;
+    --emerald-2: #10b981;
+    --cyan: #06b6d4;
+    --card: rgba(255, 255, 255, 0.03);
+    --card-2: rgba(255, 255, 255, 0.045);
+    --border: rgba(255, 255, 255, 0.06);
+    --border-2: rgba(255, 255, 255, 0.1);
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-dimmer: #64748b;
+    --grad: linear-gradient(135deg, #34d399 0%, #06b6d4 100%);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 1200px 600px at 50% -10%, rgba(52, 211, 153, 0.12), transparent 60%),
+      radial-gradient(ellipse 800px 500px at 85% 30%, rgba(6, 182, 212, 0.08), transparent 60%),
+      radial-gradient(ellipse 600px 400px at 10% 60%, rgba(52, 211, 153, 0.05), transparent 60%);
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===================== NAVBAR ===================== */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    background: rgba(2, 6, 23, 0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--grad);
+    display: grid; place-items: center;
+    box-shadow: 0 4px 18px rgba(52, 211, 153, 0.35);
+  }
+  .logo-mark svg { width: 16px; height: 16px; }
+  .logo-text { color: var(--emerald); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-link {
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 500;
+    transition: color .2s, background .2s;
+  }
+  .nav-link:hover { color: var(--text); background: var(--card); }
+
+  .lang-switch {
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--text-dimmer);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--card);
+    transition: color .2s, background .2s;
+    text-transform: uppercase;
+  }
+  .lang-switch:hover { color: var(--text); background: var(--card-2); border-color: var(--border-2); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    transition: transform .15s, box-shadow .2s, background .2s;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--emerald);
+    color: #022c1f;
+    box-shadow: 0 4px 18px rgba(52, 211, 153, 0.28), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn-primary:hover { background: #4ade9f; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(52, 211, 153, 0.4); }
+  .btn-grad {
+    background: var(--grad);
+    color: #022c1f;
+    box-shadow: 0 4px 22px rgba(52, 211, 153, 0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .btn-grad:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(52, 211, 153, 0.5); }
+  .btn-ghost {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border-2);
+  }
+  .btn-ghost:hover { background: var(--card-2); }
+  .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+
+  /* ===================== HERO ===================== */
+  .hero { padding: 140px 0 80px; position: relative; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 8px;
+    border-radius: 999px;
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.22);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #6ee7b7;
+    letter-spacing: 0.01em;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--emerald);
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.18);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.18); }
+    50% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0.04); }
+  }
+
+  .hero h1 {
+    font-size: clamp(40px, 5.4vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin: 24px 0 22px;
+    font-weight: 700;
+    color: #f8fafc;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p.lead {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 540px;
+    margin: 0 0 32px;
+    line-height: 1.55;
+  }
+
+  .email-form {
+    display: flex;
+    gap: 8px;
+    max-width: 500px;
+    padding: 6px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--border-2);
+    backdrop-filter: blur(10px);
+    transition: border-color .2s;
+  }
+  .email-form:focus-within { border-color: rgba(52, 211, 153, 0.4); }
+  .email-form input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14.5px;
+    padding: 10px 14px;
+  }
+  .email-form input::placeholder { color: var(--text-dimmer); }
+  .email-form .btn { padding: 11px 18px; }
+
+  .form-msg {
+    margin-top: 10px;
+    font-size: 13px;
+    min-height: 18px;
+    display: none;
+  }
+  .form-msg.success { color: var(--emerald); display: block; }
+  .form-msg.error { color: #fca5a5; display: block; }
+
+  .hero-meta {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-dimmer);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-meta .avatars { display: flex; }
+  .hero-meta .avatars > div {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    margin-left: -7px;
+    background: linear-gradient(135deg, #34d399, #06b6d4);
+  }
+  .hero-meta .avatars > div:nth-child(2) { background: linear-gradient(135deg, #a78bfa, #ec4899); }
+  .hero-meta .avatars > div:nth-child(3) { background: linear-gradient(135deg, #fbbf24, #f97316); }
+  .hero-meta .avatars > div:nth-child(4) { background: linear-gradient(135deg, #38bdf8, #34d399); }
+  .hero-meta .avatars > div:first-child { margin-left: 0; }
+
+  /* ===================== DASHBOARD MOCKUP ===================== */
+  .mockup-wrap { position: relative; perspective: 1400px; }
+  .mockup {
+    position: relative;
+    background: linear-gradient(180deg, #0a1226 0%, #060c1f 100%);
+    border: 1px solid var(--border-2);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 30px 80px -20px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 0 60px rgba(52, 211, 153, 0.08);
+    transform: rotateY(-4deg) rotateX(3deg);
+  }
+  .mockup-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .mockup-bar .dot { width: 10px; height: 10px; border-radius: 50%; background: #1e293b; }
+  .mockup-bar .dot.r { background: #ef4444; }
+  .mockup-bar .dot.y { background: #f59e0b; }
+  .mockup-bar .dot.g { background: #10b981; }
+  .mockup-bar .url {
+    margin-left: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dimmer);
+  }
+  .mockup-body {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    min-height: 460px;
+  }
+  .mockup-side {
+    border-right: 1px solid var(--border);
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .side-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px 14px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--emerald);
+  }
+  .side-logo > div { width: 18px; height: 18px; border-radius: 5px; background: var(--grad); }
+  .side-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 9px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: var(--text-dimmer);
+  }
+  .side-item.active { background: rgba(52, 211, 153, 0.1); color: var(--emerald); }
+  .side-item .ico { width: 14px; height: 14px; border-radius: 3px; background: currentColor; opacity: 0.45; }
+  .side-item.active .ico { opacity: 0.9; }
+  .mockup-main { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+  .main-head { display: flex; justify-content: space-between; align-items: center; }
+  .main-title { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+  .main-sub { font-size: 10.5px; color: var(--text-dimmer); margin-top: 2px; }
+  .pill { font-size: 10px; padding: 4px 9px; border-radius: 999px; background: rgba(52, 211, 153, 0.12); color: var(--emerald); font-weight: 600; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; }
+  .stat-label { font-size: 9.5px; color: var(--text-dimmer); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-val { font-size: 17px; font-weight: 700; color: #f1f5f9; margin-top: 3px; letter-spacing: -0.02em; }
+  .stat-delta { font-size: 9.5px; color: var(--emerald); margin-top: 1px; }
+  .chart { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .chart svg { width: 100%; height: 100px; display: block; }
+  .appt-list { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .appt { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 11px; }
+  .appt:last-child { border-bottom: none; }
+  .appt-time { color: var(--emerald); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; }
+  .appt-name { color: #e2e8f0; font-weight: 500; }
+  .appt-type { color: var(--text-dimmer); font-size: 10px; margin-top: 1px; }
+  .appt-tag { font-size: 9.5px; padding: 3px 7px; border-radius: 4px; background: rgba(6, 182, 212, 0.1); color: #67e8f9; font-weight: 600; }
+  .appt-tag.green { background: rgba(52, 211, 153, 0.12); color: var(--emerald); }
+  .float-card {
+    position: absolute;
+    bottom: 44px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-2);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+  }
+  .float-card .fc-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--emerald);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ===================== SECTIONS ===================== */
+  section { padding: 100px 0; }
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--emerald);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(34px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 0 0 18px;
+    color: #f1f5f9;
+    text-wrap: balance;
+  }
+  .section-desc {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 640px;
+    line-height: 1.55;
+    margin: 0 auto 54px;
+  }
+  .center { text-align: center; }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--border-2); }
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(52, 211, 153, 0.1);
+    display: grid; place-items: center;
+    margin-bottom: 16px;
+    font-size: 20px;
+  }
+  .card h3 { font-size: 17px; font-weight: 600; margin: 0 0 8px; color: #f1f5f9; }
+  .card p { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin: 0; }
+
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .bento {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    transition: transform .2s, border-color .2s;
+  }
+  .bento:hover { transform: translateY(-2px); border-color: var(--border-2); }
+  .bento .num {
+    font-size: 38px;
+    font-weight: 700;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .bento p { font-size: 13.5px; color: var(--text-dim); margin: 0; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .card-lg {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    transition: transform .2s, border-color .2s;
+  }
+  .card-lg:hover { transform: translateY(-2px); border-color: var(--border-2); }
+  .card-lg h3 { font-size: 20px; font-weight: 600; margin: 0 0 10px; color: #f1f5f9; }
+  .card-lg p { font-size: 14.5px; color: var(--text-dim); line-height: 1.55; margin: 0 0 14px; }
+  .check-list { list-style: none; padding: 0; margin: 0; }
+  .check-list li {
+    padding: 4px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .check-list li::before {
+    content: "✓";
+    color: var(--emerald);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* ===================== PRICING ===================== */
+  .pricing-card {
+    background: var(--grad);
+    border-radius: 20px;
+    padding: 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 30px 60px -20px rgba(52, 211, 153, 0.3);
+  }
+  .pricing-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.55);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .pricing-card > * { position: relative; }
+  .pricing-card h3 { font-size: 38px; font-weight: 700; margin: 0; color: #f8fafc; }
+  .pricing-card .price-sub { font-size: 15px; color: rgba(255,255,255,0.7); margin-top: 6px; }
+  .pricing-card ul { list-style: none; padding: 0; margin: 24px 0 32px; text-align: left; display: inline-block; }
+  .pricing-card ul li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pricing-card ul li::before { content: "✓"; color: var(--emerald); font-weight: 700; }
+  .pricing-card .btn { font-size: 15px; padding: 14px 32px; }
+
+  /* ===================== FAQ ===================== */
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 0;
+  }
+  .faq-q {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e2e8f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    user-select: none;
+  }
+  .faq-q::after {
+    content: "+";
+    font-size: 20px;
+    color: var(--text-dimmer);
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+  .faq-q.open::after { transform: rotate(45deg); }
+  .faq-a {
+    padding-top: 12px;
+    font-size: 14.5px;
+    color: var(--text-dim);
+    line-height: 1.55;
+    display: none;
+  }
+  .faq-a.open { display: block; }
+
+  /* ===================== FOOTER ===================== */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 0 32px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .footer h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dimmer); margin: 0 0 16px; }
+  .footer a { display: block; padding: 4px 0; font-size: 14px; color: var(--text-dim); transition: color .2s; }
+  .footer a:hover { color: var(--text); }
+  .footer-bottom { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-dimmer); display: flex; justify-content: space-between; align-items: center; }
+
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+    .hero { padding: 120px 0 40px; }
+    .mockup { transform: none; }
+    .mockup-body { grid-template-columns: 1fr; }
+    .grid-3, .grid-4, .grid-2 { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    .container { padding: 0 20px; }
+    .nav-links .nav-link { display: none; }
+    .nav-links .btn { font-size: 12px; padding: 8px 12px; }
+    .email-form { flex-direction: column; }
+    .pricing-card { padding: 28px; }
+    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== NAVBAR ===================== -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="/en" class="logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8L6 5L9 8L13 3" stroke="#022c1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="6.5" stroke="#022c1f" stroke-width="1.5"/></svg>
+        </div>
+        <span class="logo-text">SereneCare</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#why" class="nav-link">Why SereneCare?</a>
+        <a href="/" class="lang-switch">ES</a>
+        <a href="#waitlist" class="btn btn-primary" id="nav-cta">Join the waitlist</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="badge"><span class="badge-dot"></span> Launching soon</div>
+        <h1>All your <em>practice</em> in one place</h1>
+        <p class="lead">
+          SereneCare helps psychologists and clinics manage appointments, clinical records, telehealth, and billing — so you can focus on what matters: your patients.
+        </p>
+        <form id="waitlist-form" class="email-form" action="#waitlist">
+          <input type="email" id="email-input" placeholder="Your email" required autocomplete="email" />
+          <button type="submit" class="btn btn-primary" id="form-btn">Join the waitlist</button>
+        </form>
+        <div id="form-msg" class="form-msg"></div>
+        <div class="hero-meta">
+          <div class="avatars"><div></div><div></div><div></div><div></div></div>
+          <span>GDPR compliant · 14-day free trial</span>
+        </div>
+      </div>
+      <div class="mockup-wrap">
+        <div class="float-card"><span class="fc-dot"></span> <span>Everything you need in one dashboard</span></div>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="url">serenecare.app</span>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-side">
+              <div class="side-logo"><div></div> S</div>
+              <div class="side-item active">
+                <div class="ico" style="background:#34d399;"></div>
+                Dashboard
+              </div>
+              <div class="side-item"><div class="ico"></div>Appointments</div>
+              <div class="side-item"><div class="ico"></div>Patients</div>
+              <div class="side-item"><div class="ico"></div>SOAP Notes</div>
+              <div class="side-item"><div class="ico"></div>Telehealth</div>
+              <div class="side-item"><div class="ico"></div>Billing</div>
+            </div>
+            <div class="mockup-main">
+              <div class="main-head">
+                <div><div class="main-title">Weekly Overview</div><div class="main-sub">Your practice at a glance</div></div>
+                <span class="pill">+12% vs last week</span>
+              </div>
+              <div class="stats-row">
+                <div class="stat"><div class="stat-label">Appointments</div><div class="stat-val">24</div><div class="stat-delta">+3 today</div></div>
+                <div class="stat"><div class="stat-label">Patients</div><div class="stat-val">18</div><div class="stat-delta">+2 this week</div></div>
+                <div class="stat"><div class="stat-label">Revenue</div><div class="stat-val">€1,280</div><div class="stat-delta">+8%</div></div>
+              </div>
+              <div class="chart">
+                <div class="chart-head"><span style="font-size:11px;color:#94a3b8;font-weight:600;">APPOINTMENTS</span><span style="font-size:10px;color:#64748b;">Last 7 days</span></div>
+                <svg viewBox="0 0 300 100" preserveAspectRatio="none">
+                  <polyline points="0,80 30,60 60,70 90,40 120,50 150,20 180,30 210,10 240,25 270,15 300,5"
+                    fill="none" stroke="url(#chartGrad)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                  <linearGradient id="chartGrad"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient>
+                </svg>
+              </div>
+              <div class="appt-list">
+                <div class="appt"><span class="appt-time">09:00</span><div><div class="appt-name">Ana García</div><div class="appt-type">Follow-up</div></div><span class="appt-tag">Online</span></div>
+                <div class="appt"><span class="appt-time">10:30</span><div><div class="appt-name">Carlos Ruiz</div><div class="appt-type">Assessment</div></div><span class="appt-tag green">In person</span></div>
+                <div class="appt"><span class="appt-time">12:00</span><div><div class="appt-name">Marta López</div><div class="appt-type">Therapy</div></div><span class="appt-tag">Online</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section id="features">
+  <div class="container center">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need to <br class="hide-mobile" /> run your practice</h2>
+    <p class="section-desc">From scheduling to billing, SereneCare brings all your clinical tools together in one platform.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <h3>Smart Scheduling</h3>
+        <p>Online booking, calendar sync, automated reminders, and conflict detection. Patients book easily, you save time.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <h3>Clinical Records</h3>
+        <p>SOAP notes, treatment plans, PHQ-9 / GAD-7 assessments, and patient history — all digital and organized.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎥</div>
+        <h3>Telehealth</h3>
+        <p>Secure video consultations integrated into the platform. No extra apps needed for your patients.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏥</div>
+        <h3>Patient Portal</h3>
+        <p>Patients access their appointments, history, assessments, and shared clinical notes from any device.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📄</div>
+        <h3>Informed Consent</h3>
+        <p>Digital consent management with legally binding signatures. Always up to date with GDPR.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💳</div>
+        <h3>Billing</h3>
+        <p>Invoices, payment tracking, and Stripe integration. Automate your collection process.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WHY ===================== -->
+<section id="why" style="background: var(--bg-2);">
+  <div class="container center">
+    <div class="section-label">Why SereneCare</div>
+    <h2 class="section-title">Built for the way you work</h2>
+    <p class="section-desc">We designed SereneCare with psychologists, not engineers. Every feature solves a real daily problem.</p>
+    <div class="grid-2">
+      <div class="card-lg">
+        <h3>🇪🇸 Made for Spain &amp; LATAM</h3>
+        <p>No generic anglo software. SereneCare is built for the Spanish-speaking market: GDPR, local payment methods, Spanish-language interface, and support in your timezone.</p>
+      </div>
+      <div class="card-lg">
+        <h3>🔒 Privacy-first</h3>
+        <p>GDPR compliant by design. End-to-end encryption, role-based access control, and audit logs. Your patients' data stays yours.</p>
+      </div>
+      <div class="card-lg">
+        <h3>⚡ Minimal learning curve</h3>
+        <p>Intuitive interface designed for busy clinicians. Most features are usable in under 5 minutes. No training required.</p>
+      </div>
+      <div class="card-lg">
+        <h3>💰 Fair pricing</h3>
+        <p>€29/month per psychologist. No setup fees, no hidden costs. 14-day free trial with no credit card surprises.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRICING ===================== -->
+<section id="pricing">
+  <div class="container center">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p class="section-desc">One plan. Everything included. No enterprise upsells.</p>
+    <div class="pricing-card">
+      <h3>€29 <span style="font-size:16px;font-weight:400;color:rgba(255,255,255,0.7);">/month</span></h3>
+      <div class="price-sub">per psychologist · 14-day free trial</div>
+      <ul>
+        <li>Online appointment scheduling</li>
+        <li>Unlimited SOAP notes</li>
+        <li>Secure telehealth</li>
+        <li>Patient portal</li>
+        <li>PHQ-9 / GAD-7 assessments</li>
+        <li>Digital consent management</li>
+        <li>Automated reminders</li>
+        <li>GDPR compliant</li>
+        <li>Email support</li>
+      </ul>
+      <a href="#waitlist" class="btn btn-primary" style="background:#022c1f;color:#34d399;box-shadow:none;">Join the waitlist</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WAITLIST ===================== -->
+<section id="waitlist">
+  <div class="container center">
+    <div class="section-label">Get early access</div>
+    <h2 class="section-title">Be among the first</h2>
+    <p class="section-desc">SereneCare is launching soon. Join the waitlist and get early access plus exclusive founder pricing.</p>
+    <form id="waitlist-form-2" class="email-form" style="margin:0 auto;">
+      <input type="email" id="email-input-2" placeholder="Your email" required autocomplete="email" />
+      <button type="submit" class="btn btn-primary" id="form-btn-2">Join the waitlist</button>
+    </form>
+    <div id="form-msg-2" class="form-msg" style="text-align:center;"></div>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section>
+  <div class="container center" style="max-width:720px;">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Frequently asked questions</h2>
+    <div style="text-align:left;margin-top:40px;">
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">Is there a free version?</div>
+        <div class="faq-a">We offer a 14-day free trial with full access. No credit card required during the trial. After that, it's €29/month per psychologist.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">Is my data secure?</div>
+        <div class="faq-a">Yes. SereneCare is GDPR compliant. All data is encrypted in transit and at rest. We use European cloud providers and never share patient data.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">Can I try it before paying?</div>
+        <div class="faq-a">Absolutely. You get 14 days free with all features enabled. No commitment, cancel anytime.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');">Do you offer support in English?</div>
+        <div class="faq-a">Currently our platform and support are in Spanish. English support is coming soon.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="/en" class="logo" style="margin-bottom:12px;">
+          <div class="logo-mark">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8L6 5L9 8L13 3" stroke="#022c1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="8" r="6.5" stroke="#022c1f" stroke-width="1.5"/></svg>
+          </div>
+          <span class="logo-text">SereneCare</span>
+        </a>
+        <p style="font-size:14px;color:var(--text-dim);max-width:280px;margin:12px 0 0;">Smart practice management for psychologists and mental health clinics.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#waitlist">Waitlist</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+      <div>
+        <h4>Language</h4>
+        <a href="/">Español</a>
+        <a href="/en" style="color:var(--emerald);font-weight:600;">English</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 SereneCare. All rights reserved.</span>
+      <span>GDPR compliant · EU hosted</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+// FAQ toggle
+document.querySelectorAll('.faq-q').forEach(el => {
+  el.addEventListener('click', () => {
+    el.classList.toggle('open');
+    el.nextElementSibling.classList.toggle('open');
+  });
+});
+
+// Supabase waitlist
+const SUPABASE_URL = 'https://wnuwuxenzwfqmhxagryk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndudXd1eGVuenpmcW1oeGFncnlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNTI0MDUsImV4cCI6MjA2MDcyODQwNX0.mvEznJ08AKrffNoXjgTgQ9Hgq5Wl5j7XPh7vRLqTzrQ';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function handleSubmit(formId, inputId, msgId, btnId) {
+  const form = document.getElementById(formId);
+  const input = document.getElementById(inputId);
+  const msg = document.getElementById(msgId);
+  const btn = document.getElementById(btnId);
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = input.value.trim();
+    if (!email) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Joining...';
+    msg.className = 'form-msg';
+    msg.style.display = 'none';
+
+    try {
+      const { error } = await sb.from('lista_espera').insert({ email });
+      if (error) {
+        if (error.code === '23505') {
+          msg.textContent = "You're already on the list!";
+          msg.className = 'form-msg success';
+        } else {
+          msg.textContent = 'Something went wrong. Try again.';
+          msg.className = 'form-msg error';
+        }
+      } else {
+        msg.textContent = "You're on the list! We'll be in touch soon.";
+        msg.className = 'form-msg success';
+        input.value = '';
+      }
+    } catch (err) {
+      msg.textContent = 'Connection error. Try again.';
+      msg.className = 'form-msg error';
+    }
+    msg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Join the waitlist';
+  });
+}
+
+handleSubmit('waitlist-form', 'email-input', 'form-msg', 'form-btn');
+handleSubmit('waitlist-form-2', 'email-input-2', 'form-msg-2', 'form-btn-2');
+</script>
+</body>
+</html>
