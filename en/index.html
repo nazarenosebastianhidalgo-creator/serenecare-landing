@@ -893,9 +893,9 @@ document.querySelectorAll('.faq-q').forEach(el => {
 
 // Supabase waitlist
 const SUPABASE_URL = 'https://wnuwuxenzwfqmhxagryk.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndudXd1eGVuenpmcW1oeGFncnlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNTI0MDUsImV4cCI6MjA2MDcyODQwNX0.mvEznJ08AKrffNoXjgTgQ9Hgq5Wl5j7XPh7vRLqTzrQ';
+const SUPABASE_ANON_KEY = 'sb_publishable_y1hur_kAqXbssi0onWrvpw_NT591nHJ';
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function handleSubmit(formId, inputId, msgId, btnId) {
   const form = document.getElementById(formId);
@@ -915,7 +915,7 @@ async function handleSubmit(formId, inputId, msgId, btnId) {
     msg.style.display = 'none';
 
     try {
-      const { error } = await sb.from('lista_espera').insert({ email });
+      const { error } = await db.from('lista_espera').insert({ email });
       if (error) {
         if (error.code === '23505') {
           msg.textContent = "You're already on the list!";
