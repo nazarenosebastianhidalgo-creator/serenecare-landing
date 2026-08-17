@@ -1,6 +1,11 @@
 {
   "rewrites": [
     { "source": "/psi/:slug", "destination": "https://serenecare-backend-production.up.railway.app/api/perfil-publico/:slug" },
-    { "source": "/sitemap-psicologos.xml", "destination": "https://serenecare-backend-production.up.railway.app/api/perfil-publico/sitemap.xml" }
+    { "source": "/sitemap-psicologos.xml", "destination": "https://serenecare-backend-production.up.railway.app/api/perfil-publico/sitemap.xml" },
+    { "source": "/api/:path*", "destination": "https://serenecare-backend-production.up.railway.app/api/:path*" },
+    { "source": "/screens/:path*", "destination": "https://serenecare-app.vercel.app/screens/:path*" },
+    { "source": "/js/:path*", "destination": "https://serenecare-app.vercel.app/js/:path*" },
+    { "source": "/css/:path*", "destination": "https://serenecare-app.vercel.app/css/:path*" },
+    { "source": "/acceso", "destination": "https://serenecare-app.vercel.app/acceso" }
   ]
 }
