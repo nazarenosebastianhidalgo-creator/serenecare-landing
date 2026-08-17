@@ -1,0 +1,362 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Guion demo</title></head><body><style>
+  :root {
+    --ground: #eef3f1;
+    --surface: #ffffff;
+    --surface-2: #f5f8f7;
+    --ink: #14201d;
+    --muted: #5a6b66;
+    --faint: #8a9994;
+    --line: #dde5e2;
+    --teal: #0d7a6f;
+    --teal-soft: #e2f2ef;
+    --teal-ink: #0a5a52;
+    --clay: #b0592a;
+    --clay-soft: #f7e9df;
+    --clay-ink: #8a4620;
+    --shadow: 0 1px 2px rgba(20,32,29,.04), 0 8px 24px rgba(20,32,29,.06);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0c1513;
+      --surface: #131f1c;
+      --surface-2: #182723;
+      --ink: #e7efec;
+      --muted: #9db0aa;
+      --faint: #6f827c;
+      --line: #24352f;
+      --teal: #35c9b8;
+      --teal-soft: #10322d;
+      --teal-ink: #6fe0d1;
+      --clay: #e59362;
+      --clay-soft: #33211660;
+      --clay-ink: #f0b28a;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0c1513;
+    --surface: #131f1c;
+    --surface-2: #182723;
+    --ink: #e7efec;
+    --muted: #9db0aa;
+    --faint: #6f827c;
+    --line: #24352f;
+    --teal: #35c9b8;
+    --teal-soft: #10322d;
+    --teal-ink: #6fe0d1;
+    --clay: #e59362;
+    --clay-soft: #33211660;
+    --clay-ink: #f0b28a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 22px 80px; }
+  .mono { font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace; }
+
+  /* ── Header ── */
+  header { margin-bottom: 34px; }
+  .kicker {
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--teal); font-weight: 700; margin: 0 0 10px;
+  }
+  h1 {
+    font-size: clamp(28px, 5vw, 40px); line-height: 1.08; margin: 0 0 14px;
+    letter-spacing: -.02em; text-wrap: balance; font-weight: 800;
+  }
+  .promise {
+    font-size: clamp(16px, 2.4vw, 19px); color: var(--muted); margin: 0 0 22px;
+    max-width: 58ch; text-wrap: pretty;
+  }
+  .promise b { color: var(--ink); font-weight: 700; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 13px; font-size: 13px; color: var(--muted); box-shadow: var(--shadow);
+  }
+  .chip b { color: var(--ink); font-weight: 650; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex: none; }
+
+  /* ── Section titles ── */
+  .sec-label {
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--faint); font-weight: 700; margin: 40px 0 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  /* ── Pre-flight card ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .checklist li { display: flex; gap: 12px; align-items: flex-start; }
+  .box {
+    flex: none; width: 19px; height: 19px; border: 2px solid var(--teal); border-radius: 6px;
+    margin-top: 2px;
+  }
+  .checklist .t { font-size: 15px; }
+  .checklist .t small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .cred {
+    display: inline-block; background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 7px; padding: 2px 8px; font-size: 13px; color: var(--teal-ink);
+  }
+  :root[data-theme="dark"] .cred, :root:not([data-theme="light"]) .cred { color: var(--teal-ink); }
+
+  /* ── Steps ── */
+  .step {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 0; overflow: hidden; margin-bottom: 16px;
+  }
+  .step-head {
+    display: flex; align-items: baseline; gap: 14px; padding: 20px 24px 14px;
+  }
+  .num {
+    flex: none; font-size: 13px; font-weight: 800; color: var(--teal);
+    font-variant-numeric: tabular-nums; letter-spacing: .04em;
+    border: 1.5px solid var(--teal); border-radius: 8px; padding: 3px 9px; line-height: 1;
+  }
+  .step-head h3 { margin: 0; font-size: 19px; font-weight: 750; letter-spacing: -.01em; }
+  .time {
+    margin-left: auto; font-size: 12px; color: var(--faint); font-weight: 600;
+    white-space: nowrap; align-self: center;
+  }
+  .lanes { display: grid; gap: 1px; background: var(--line); }
+  @media (min-width: 620px) { .lanes { grid-template-columns: 1fr 1fr; } }
+  .lane { background: var(--surface); padding: 16px 24px 20px; }
+  .lane-label {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
+    margin: 0 0 9px; display: flex; align-items: center; gap: 7px;
+  }
+  .lane.do .lane-label { color: var(--teal); }
+  .lane.say .lane-label { color: var(--clay); }
+  .lane.say { background: var(--clay-soft); }
+  :root:not([data-theme="light"]) .lane.say, :root[data-theme="dark"] .lane.say { background: var(--surface-2); }
+  .lane p { margin: 0 0 8px; font-size: 14.5px; }
+  .lane p:last-child { margin-bottom: 0; }
+  .lane.say p { color: var(--ink); font-style: italic; }
+  .lane.say p b { font-style: normal; color: var(--clay-ink); }
+  :root:not([data-theme="light"]) .lane.say p b, :root[data-theme="dark"] .lane.say p b { color: var(--clay-ink); }
+  .path {
+    font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 12.5px; background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 6px; padding: 2px 7px; color: var(--teal-ink); white-space: nowrap;
+  }
+  :root:not([data-theme="light"]) .path, :root[data-theme="dark"] .path { color: var(--teal-ink); }
+  .fallback {
+    margin: 0 24px 18px; font-size: 12.5px; color: var(--muted);
+    border-left: 2px solid var(--clay); padding: 4px 0 4px 12px;
+  }
+  .fallback b { color: var(--clay-ink); }
+  :root:not([data-theme="light"]) .fallback b, :root[data-theme="dark"] .fallback b { color: var(--clay-ink); }
+
+  /* ── Flywheel ── */
+  .flywheel { display: grid; gap: 24px; align-items: center; margin-top: 4px; }
+  @media (min-width: 640px) { .flywheel { grid-template-columns: 220px 1fr; } }
+  .fw-svg { width: 100%; max-width: 220px; margin: 0 auto; display: block; color: var(--teal); }
+  .fw-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .fw-list li { display: flex; gap: 11px; font-size: 14.5px; align-items: flex-start; }
+  .fw-list .n { flex: none; color: var(--teal); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+  /* ── Objections ── */
+  .obj { display: grid; gap: 10px; }
+  .obj details {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 11px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .obj summary {
+    cursor: pointer; padding: 15px 20px; font-weight: 650; font-size: 15px;
+    list-style: none; display: flex; align-items: center; gap: 11px;
+  }
+  .obj summary::-webkit-details-marker { display: none; }
+  .obj summary::before {
+    content: "＂"; color: var(--clay); font-weight: 800; font-size: 20px; line-height: 0;
+    margin-top: 6px;
+  }
+  .obj summary::after {
+    content: "+"; margin-left: auto; color: var(--faint); font-weight: 700; font-size: 18px;
+  }
+  .obj details[open] summary::after { content: "−"; }
+  .obj .ans { padding: 0 20px 18px 42px; font-size: 14.5px; color: var(--muted); }
+  .obj .ans b { color: var(--ink); font-weight: 650; }
+
+  .golden {
+    margin-top: 40px; background: var(--teal-soft); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px 24px;
+  }
+  :root:not([data-theme="light"]) .golden, :root[data-theme="dark"] .golden { background: var(--surface-2); }
+  .golden h3 { margin: 0 0 12px; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--teal-ink); }
+  :root:not([data-theme="light"]) .golden h3, :root[data-theme="dark"] .golden h3 { color: var(--teal-ink); }
+  .golden ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+  .golden li { font-size: 14.5px; }
+  .golden li b { font-weight: 700; }
+
+  footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--faint); }
+  a { color: var(--teal-ink); }
+  :root:not([data-theme="light"]) a, :root[data-theme="dark"] a { color: var(--teal-ink); }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">Guion de demo · videollamada</p>
+    <h1>No le vendas un software. Mostrale cómo se le llena la consulta sola.</h1>
+    <p class="promise">Toda la demo cuelga de una sola idea: <b>hoy sale a buscar pacientes; con esto, los pacientes la encuentran a ella.</b> Dos partes — cómo la <b>encuentran</b> (posicionamiento) y cómo la <b>eligen</b> (anuncios) — y al final, cómo una alimenta a la otra sola.</p>
+    <div class="meta">
+      <span class="chip"><span class="dot"></span><b>~15 min</b> compartiendo pantalla</span>
+      <span class="chip">Login demo: <b class="mono">demo.clinica@serenecare.es</b></span>
+      <span class="chip">Clave: <b class="mono">DemoSerene2026!</b></span>
+    </div>
+  </header>
+
+  <p class="sec-label">Antes de marcar</p>
+  <div class="card">
+    <ul class="checklist">
+      <li><span class="box"></span><span class="t">Sesión demo iniciada en el portal <small>Entrá una vez y dejá el navegador abierto — nada de loguearte en vivo.</small></span></li>
+      <li><span class="box"></span><span class="t">3 pestañas listas en este orden <small>1) la ficha pública · 2) portal → <b>Reputación &amp; Google</b> · 3) portal → <b>Marketing IA</b>. Así saltás sin buscar.</small></span></li>
+      <li><span class="box"></span><span class="t">Ficha pública abierta y cargada <small><span class="cred mono">serenecare.es/psi/clinica-demo-serenecare</span> — que se vea el 4,8★ antes de compartir.</small></span></li>
+      <li><span class="box"></span><span class="t">Cámara encendida, notificaciones en silencio <small>La ves a los ojos primero; recién después compartís pantalla.</small></span></li>
+    </ul>
+  </div>
+
+  <p class="sec-label">La demo, paso a paso</p>
+
+  <div class="step">
+    <div class="step-head"><span class="num">01</span><h3>El gancho — sin pantalla todavía</h3><span class="time">30 seg</span></div>
+    <div class="lanes">
+      <div class="lane do">
+        <p class="lane-label">◆ Hacés</p>
+        <p>Cámara a cámara, aún no compartas. Preguntá primero: <span class="path">¿hoy cómo te llegan los pacientes nuevos?</span></p>
+        <p>Escuchá 20 segundos. Ahí tenés su dolor real para devolvérselo toda la demo.</p>
+      </div>
+      <div class="lane say">
+        <p class="lane-label">● Decís</p>
+        <p><b>«Te voy a mostrar dos cosas: cómo hacer que te encuentren en Google, y cómo traer pacientes con anuncios que se escriben solos. Y lo mejor: se retroalimentan. Dale, comparto pantalla.»</b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="num">02</span><h3>Posicionamiento · La ficha que te encuentra en Google</h3><span class="time">3 min</span></div>
+    <div class="lanes">
+      <div class="lane do">
+        <p class="lane-label">◆ Hacés</p>
+        <p>Compartí la pestaña de la <b>ficha pública</b>. Scrolleá despacio: nombre, ciudad, especialidades, <b>reseñas reales</b> y el <b>4,8★</b>.</p>
+        <p>Mostrá el botón <span class="path">Reservar</span> arriba.</p>
+      </div>
+      <div class="lane say">
+        <p class="lane-label">● Decís</p>
+        <p><b>«Esta página se arma sola con tu perfil y tus reseñas. Google la lee y la indexa — o sea, aparecés cuando alguien busca 'psicólogo en tu ciudad'. Y desde acá el paciente reserva directo, sin llamar.»</b></p>
+      </div>
+    </div>
+    <p class="fallback"><b>Si preguntan por el SEO técnico:</b> «El contenido está en el código de la página, no cargado con JavaScript — por eso Google lo entiende de verdad, con tu puntuación y tus opiniones.» No entres en más detalle salvo que insista.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="num">03</span><h3>Posicionamiento · Reseñas en piloto automático + Google</h3><span class="time">4 min</span></div>
+    <div class="lanes">
+      <div class="lane do">
+        <p class="lane-label">◆ Hacés</p>
+        <p>Pasá a la pestaña <b>Reputación &amp; Google</b>. Mostrá las <b>stats</b> (media, publicadas, privadas) y la lista de reseñas con el botón <span class="path">Responder</span>.</p>
+        <p>Explicá el disparo automático. Después, clic en <span class="path">Optimizador Google</span> y esperá el resultado <b>en vivo</b>.</p>
+      </div>
+      <div class="lane say">
+        <p class="lane-label">● Decís</p>
+        <p><b>«Cuando un paciente mejora o cumple sesiones, el sistema le pide la reseña solo. Si es buena, se publica y suma; si es baja, te llega en privado a vos — no se hace pública. Y esto —</b> [señalás el optimizador] <b>— te arma la ficha de Google lista para pegar: categoría, descripción, fotos, publicaciones.»</b></p>
+      </div>
+    </div>
+    <p class="fallback"><b>Si el optimizador tarda:</b> seguí hablando del bucle de reseñas mientras carga (tarda unos segundos, llama a la IA). <b>Si falla:</b> «se está generando, te lo paso por escrito después» y avanzá a los anuncios — no te trabes.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="num">04</span><h3>Anuncios · Marketing IA en vivo</h3><span class="time">4 min</span></div>
+    <div class="lanes">
+      <div class="lane do">
+        <p class="lane-label">◆ Hacés</p>
+        <p>Pestaña <b>Marketing IA</b>. Escribí un objetivo concreto delante de ella — usá <b>su</b> dolor del paso 01. Ej: <span class="path">captar pacientes con ansiedad</span>. Generá.</p>
+        <p>Leé en voz alta 1 anuncio y el <b>guion de video</b>. Señalá que cita una <b>reseña real</b>.</p>
+      </div>
+      <div class="lane say">
+        <p class="lane-label">● Decís</p>
+        <p><b>«Escribo lo que querés lograr y me devuelve los anuncios, el guion del video para grabar con el celu y los posts de la semana. Fijate que usa tus opiniones reales como prueba — no inventa nada. Esto es lo que hoy le pagás a una agencia.»</b></p>
+      </div>
+    </div>
+    <p class="fallback"><b>Probado hoy y funciona.</b> Genera 2-3 anuncios + guion + posts + ideas en pocos segundos. Si por lo que sea no responde, tenés el ejemplo ya generado para leer y no cortar el ritmo.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="num">05</span><h3>El cierre · Cómo una alimenta a la otra</h3><span class="time">2 min</span></div>
+    <div class="lane" style="border:0;">
+      <div class="flywheel">
+        <svg class="fw-svg" viewBox="0 0 200 200" role="img" aria-label="Rueda: anuncios, pacientes, reseñas, Google, y vuelta a empezar">
+          <circle cx="100" cy="100" r="66" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 7" opacity="0.5"/>
+          <g fill="currentColor">
+            <circle cx="100" cy="30" r="6"/><circle cx="170" cy="100" r="6"/>
+            <circle cx="100" cy="170" r="6"/><circle cx="30" cy="100" r="6"/>
+          </g>
+          <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M150 55 l6 -2 -1 7" transform="rotate(0 150 55)"/>
+          </g>
+          <text x="100" y="100" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="13" font-weight="700" font-family="sans-serif">gira sola</text>
+        </svg>
+        <ul class="fw-list">
+          <li><span class="n">1</span><span>Los <b>anuncios</b> te traen pacientes nuevos.</span></li>
+          <li><span class="n">2</span><span>Los <b>pacientes</b> que mejoran dejan <b>reseñas</b> (el sistema se las pide solo).</span></li>
+          <li><span class="n">3</span><span>Las reseñas suben tu <b>Google y tu ficha</b>.</span></li>
+          <li><span class="n">4</span><span>Te <b>encuentran solos</b> → más pacientes → más reseñas. La rueda gira.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane say" style="grid-column:1 / -1;">
+        <p class="lane-label">● Decís (el cierre)</p>
+        <p><b>«Por eso no es un gasto más: cada paciente que entra deja una reseña que te trae al siguiente. ¿Lo arrancamos con tu clínica esta semana y lo dejamos andando?»</b> Después callate y dejala responder.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="sec-label">Si pone un "pero"</p>
+  <div class="obj">
+    <details>
+      <summary>Está caro / no sé si lo puedo pagar</summary>
+      <div class="ans">Ya cerraste el precio con ella en su moneda, así que traelo a resultado: <b>«con que llenes una o dos sesiones más al mes, ya se paga solo — y esto trabaja para vos todos los días».</b> No bajes el precio; subí el valor.</div>
+    </details>
+    <details>
+      <summary>¿Esto de verdad funciona / no será humo?</summary>
+      <div class="ans">Mostrá que es real, no promesas: <b>las reseñas de la ficha son de verdad, el anuncio se generó recién delante de ella.</b> «No te prometo pacientes mágicos; te doy la máquina que hace que te encuentren y te elijan. El trabajo pesado lo hace ella sola.»</div>
+    </details>
+    <details>
+      <summary>Ya tengo otro sistema / me da fiaca cambiarme</summary>
+      <div class="ans"><b>«No tenés que dejar nada de golpe. Empezás por esto — la parte que te trae pacientes — y lo demás lo vamos migrando con vos, sin que pares.»</b> El dolor de cambiarse es la objeción real; desactivala con acompañamiento.</div>
+    </details>
+    <details>
+      <summary>No tengo perfil de Google / no sé usarlo</summary>
+      <div class="ans"><b>«Mejor todavía: el optimizador te lo deja listo para armarlo, y las reseñas empiezan a llenarlo desde el día uno.»</b> Es una ventaja, no un freno — está empezando limpio.</div>
+    </details>
+  </div>
+
+  <div class="golden">
+    <h3>Reglas de oro</h3>
+    <ul>
+      <li><b>Menos features, más su dolor.</b> Todo lo que muestres, atalo a lo que ella dijo en el paso 01.</li>
+      <li><b>Nunca prometas pacientes garantizados.</b> Prometé la máquina, no el milagro — es salud, y la honestidad vende más acá.</li>
+      <li><b>Generá en vivo, no muestres capturas.</b> Ver el anuncio aparecer solo es el momento "ajá".</li>
+      <li><b>Cerrá con pregunta, no con monólogo.</b> «¿Lo arrancamos esta semana?» y silencio.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Guion interno para la videollamada de demo · SereneCare. Datos de la cuenta demo — recordá revertir cualquier ajuste después de la llamada.
+  </footer>
+</div>
+</body></html>
